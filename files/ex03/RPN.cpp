@@ -1,7 +1,7 @@
 #include "RPN.hpp"
 
-bool isOperator(char c) {
-    switch (c) {
+bool isOperator(char operator_simbol) {
+    switch (operator_simbol) {
         case AND:
         case NOT:
         case OR:
@@ -12,6 +12,21 @@ bool isOperator(char c) {
         default:
             return false;
     }
+}
+bool exec_operation(bool bit_a, bool bit_b, char operator_simbol) {
+    switch (operator_simbol) {
+        case AND:
+            return (bit_a & bit_b);
+        case OR:
+            return (bit_a | bit_b);
+        case XOR:
+            return (bit_a ^ bit_b);
+        case MATERIAL_CONDITION:
+            return (!bit_a | bit_b);
+        case LOGICAL_EQUIVALENCE:
+            return (!(bit_a ^ bit_b));
+    }
+    return 0;
 }
 
 bool RPN_bool(std::string stack) {
@@ -26,52 +41,27 @@ bool RPN_bool(std::string stack) {
         }
         switch(*it) {
             case AND: 
+            case XOR:
+            case MATERIAL_CONDITION: 
+            case OR: 
+            case LOGICAL_EQUIVALENCE:
                 b = operate.back();
                 operate.pop_back();
                 a = operate.back();
                 operate.pop_back();
-                operate.push_back((a & b));
+
+                operate.push_back(exec_operation(a, b, *it));
                 break;
             case NOT:
                 a = operate.back();
                 operate.pop_back();
                 operate.push_back(!a);
                 break;
-            case OR: 
-                b = operate.back();
-                operate.pop_back();
-                a = operate.back();
-                operate.pop_back();
-                operate.push_back((a | b));
-                break;
-            case XOR: 
-                std::cout << "XOR\n";
-                b = operate.back();
-                operate.pop_back();
-                a = operate.back();
-                operate.pop_back();
-                operate.push_back((a ^ b));
-                break;
             case '1':
                 operate.push_back(true); 
                 break;
             case '0':
                 operate.push_back(false); 
-                break;
-            case MATERIAL_CONDITION: 
-                b = operate.back();
-                operate.pop_back();
-                a = operate.back();
-                operate.pop_back();
-                operate.push_back((!a | b));
-                break;
-            case LOGICAL_EQUIVALENCE:
-                b = operate.back();
-                operate.pop_back();
-                a = operate.back();
-                operate.pop_back();
-                operate.push_back(!(a ^ b));             
-                std::cout << "LOGICAL_EQUIVALENCE\n";  
                 break;
         }
     }
