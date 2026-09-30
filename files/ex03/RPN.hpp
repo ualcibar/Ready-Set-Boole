@@ -5,8 +5,19 @@
 #include <string>
 #include <vector>
 
-enum Opertors {AND = '&', NOT = '!', OR = '|', XOR = '^', MATERIAL_CONDITION = '>', LOGICAL_EQUIVALENCE = '='};
+enum Opertors {
+    AND = '&', 
+    NOT = '!', 
+    OR = '|', 
+    XOR = '^', 
+    MATERIAL_CONDITION = '>', 
+    LOGICAL_EQUIVALENCE = '='
+};
 
 bool RPN_bool (std::string stack);
+bool isOperator(char operator_simbol);
+bool extract_bit(std::vector <bool> &operate);
+bool exec_operation(bool bit_a, bool bit_b, char operator_simbol);
+bool RPN_bool(std::string stack);
 
 #endif

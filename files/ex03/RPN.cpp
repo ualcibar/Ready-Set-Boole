@@ -8,11 +8,20 @@ bool isOperator(char operator_simbol) {
         case XOR:
         case MATERIAL_CONDITION:
         case LOGICAL_EQUIVALENCE:
+        case 1:
+        case 0:
             return true;
         default:
             return false;
     }
 }
+
+bool extract_bit(std::vector <bool> &operate) {
+    bool bit = operate.back();
+    operate.pop_back();
+    return bit;
+}
+
 bool exec_operation(bool bit_a, bool bit_b, char operator_simbol) {
     switch (operator_simbol) {
         case AND:
@@ -35,7 +44,7 @@ bool RPN_bool(std::string stack) {
     bool b;
 
     for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() == 0)) {
+        if(!isOperator(*it) || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))) {
             std::cout << "Invalid formula\n";
             return 0;
         }
