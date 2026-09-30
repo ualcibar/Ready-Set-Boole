@@ -8,17 +8,25 @@ bool isOperator(char operator_simbol) {
         case XOR:
         case MATERIAL_CONDITION:
         case LOGICAL_EQUIVALENCE:
-        case 1:
-        case 0:
             return true;
         default:
             return false;
     }
 }
 
-bool extract_bit(std::vector <bool> &operate) {
-    bool bit = operate.back();
-    operate.pop_back();
+bool isBit(char bit) {
+    switch (bit) {
+        case '1':
+        case '0':
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool extract_bit(std::stack <bool> &operate) {
+    bool bit = operate.top();
+    operate.pop();
     return bit;
 }
 
@@ -39,12 +47,13 @@ bool exec_operation(bool bit_a, bool bit_b, char operator_simbol) {
 }
 
 bool RPN_bool(std::string stack) {
-    std::vector<bool> operate;
+    std::stack<bool> operate;
     bool a;
     bool b;
 
     for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if(!isOperator(*it) || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))) {
+        if(!(isOperator(*it) || isBit(*it)) || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))) {
+            
             std::cout << "Invalid formula\n";
             return 0;
         }
@@ -54,25 +63,25 @@ bool RPN_bool(std::string stack) {
             case MATERIAL_CONDITION: 
             case OR: 
             case LOGICAL_EQUIVALENCE:
-                b = operate.back();
-                operate.pop_back();
-                a = operate.back();
-                operate.pop_back();
+                b = operate.top();
+                operate.pop();
+                a = operate.top();
+                operate.pop();
 
-                operate.push_back(exec_operation(a, b, *it));
+                operate.push(exec_operation(a, b, *it));
                 break;
             case NOT:
-                a = operate.back();
-                operate.pop_back();
-                operate.push_back(!a);
+                a = operate.top();
+                operate.pop();
+                operate.push(!a);
                 break;
             case '1':
-                operate.push_back(true); 
+                operate.push(true); 
                 break;
             case '0':
-                operate.push_back(false); 
+                operate.push(false); 
                 break;
         }
     }
-    return operate.back();
+    return operate.top();
 }

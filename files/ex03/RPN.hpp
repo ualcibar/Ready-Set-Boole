@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
+#include <stack>
 
 enum Opertors {
     AND = '&', 
@@ -16,7 +16,7 @@ enum Opertors {
 
 bool RPN_bool (std::string stack);
 bool isOperator(char operator_simbol);
-bool extract_bit(std::vector <bool> &operate);
+bool extract_bit(std::stack <bool> &operate);
 bool exec_operation(bool bit_a, bool bit_b, char operator_simbol);
 bool RPN_bool(std::string stack);
 
