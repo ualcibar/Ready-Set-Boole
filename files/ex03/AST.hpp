@@ -12,3 +12,5 @@ struct Node
  
     Node(char v) : value(v), left(nullptr), right(nullptr) {}
 };
+
+#endif

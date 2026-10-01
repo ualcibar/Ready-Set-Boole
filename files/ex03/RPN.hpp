@@ -5,6 +5,8 @@
 #include <string>
 #include <stack>
 
+#include "AST.hpp"
+
 enum Opertors {
     AND = '&', 
     NOT = '!', 
@@ -18,6 +20,6 @@ bool RPN_bool (std::string stack);
 bool isOperator(char operator_simbol);
 bool extract_bit(std::stack <bool> &operate);
 bool exec_operation(bool bit_a, bool bit_b, char operator_simbol);
-bool RPN_bool(std::string stack);
+bool AST(std::string stack);
 
 #endif

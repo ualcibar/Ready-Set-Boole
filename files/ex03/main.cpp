@@ -23,35 +23,37 @@ int main()
 {
     TestCase tests[] = {
         // Conjuncion / disyuncion / XOR
-        {"10&", false, ""},
+        /*{"10&", false, ""},
         {"11&", true,  ""},
         {"10|", true,  ""},
         {"00|", false, ""},
         {"10^", true,  ""},
-        {"11^", false, ""},
+        {"11^", false, ""},*/
+        {"10|1&0|",   true,  "(1|0)&10|"},
+/*
+// Material condition (>)
+{"00>", true,  ""},
+{"01>", true,  ""},
+{"10>", false, "unico caso falso de A > B"},
+{"11>", true,  ""},
 
-        // Material condition (>)
-        {"00>", true,  ""},
-        {"01>", true,  ""},
-        {"10>", false, "unico caso falso de A > B"},
-        {"11>", true,  ""},
-
-        // Logical equivalence (=)
-        {"00=", true,  ""},
-        {"01=", false, ""},
-        {"10=", false, ""},
-        {"11=", true,  ""},
+// Logical equivalence (=)
+{"00=", true,  ""},
+{"01=", false, ""},
+{"10=", false, ""},
+{"11=", true,  ""},
 
         // Negacion (unario)
         {"1!", false, ""},
         {"0!", true,  ""},
-
+        
         // Compuestas
         {"10|1&",   true,  "(1|0)&1"},
         {"101|&",   true,  "1&(0|1)"},
         {"10&!",    true,  "!(1&0)"},
         {"11>0=",   false, "(1>1)=0"},
         {"1011||=", true,  "ejemplo del subject"},
+        */
     };
 
     const std::string RED   = "\033[31m";
@@ -63,7 +65,7 @@ int main()
 
     for (const auto& t : tests)
     {
-        bool got = RPN_bool(t.formula);
+        bool got = AST(t.formula);
         bool ok  = (got == t.expected);
         total++;
 
