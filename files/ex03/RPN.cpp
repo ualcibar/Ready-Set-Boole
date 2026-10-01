@@ -52,7 +52,7 @@ bool RPN_bool(std::string stack) {
     bool b;
 
     for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if(!(isOperator(*it) || isBit(*it)) || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))) {
+        if(!(isOperator(*it) || isBit(*it)) /*|| ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))*/) {
             
             std::cout << "Invalid formula\n";
             return 0;
@@ -93,19 +93,24 @@ void print_AST(const Node *root) {
     while (current->right != nullptr) {
         if ((i == 1)) {
             for (int f = 0; f < (i - 1) * 2; ++f)
-            std::cout << " ";
+                std::cout << " ";
             std::cout << "  " << current->value << "\n";
         }
         for (int f = 0; f < (i - 1) * 2; ++f)
             std::cout << " ";
         std::cout << " /" << " \\ \n";
         for (int f = 0; f < (i - 1) * 2; ++f)
-        std::cout << " ";
-        std::cout << current->left->value;
-        std::cout << "   " << current->right->value;
-    std::cout << "\n";
-        i++;
+            std::cout << " ";
+        if (current->left != nullptr)
+            std::cout << current->left->value;
+        if (current->right != nullptr) {
+            if (isOperator(current->right->value))
+                std::cout << " ";
+            std::cout << "   " << current->right->value;
+        }
+        std::cout << "\n";
         current = current->right.get();
+        i++;
     }
     return;
 }
@@ -123,7 +128,7 @@ bool AST(std::string stack) {
             std::cout << "Invalid formula\n";
             return 0;
         }
-        std::cout<< "-----------------------" << "\n" << "i: " << i << "\n";
+        std::cout << i << "\n";
         i++;
         switch(*it) {
             case AND: 
@@ -138,40 +143,39 @@ bool AST(std::string stack) {
                         operate.pop();
                         a = operate.top();
                         operate.pop();
-                        std::cout << a << "\n";
-                        std::cout << b << "\n\n";
+
                         std::unique_ptr<Node> right_leaf  = std::make_unique<Node>(b);
                         std::unique_ptr<Node> left_leaf = std::make_unique<Node>(a);
 
-                        std::cout << "right_leaf: " << right_leaf->value << "\n";
-                        std::cout << "left_leaf: " << left_leaf->value << "\n\n";
                         root->left  = std::move(left_leaf);
                         root->right = std::move(right_leaf);
                         
                         tree_root = std::move(root);
-                        std::cout << "right: " << tree_root->right->value << "\n";
-                        std::cout << "left: " << tree_root->left->value << "\n";
-                        std::cout << "root: " << tree_root->value << "\n";
                     } else {
                         a = operate.top();
                         operate.pop();
 
                         std::unique_ptr<Node> left_leaf = std::make_unique<Node>(a);
-                        std::cout << "right_leaf: " << left_leaf->value << "\n";
                         
                         root->left  = std::move(left_leaf);
-                        std::cout << "left_leaf_root: " << root->left->value << "\n";
                         root->right = std::move(tree_root);   // <- aquí el cambio
-                        std::cout << "right_leaf_root: " << root->right->value << "\n";
                         tree_root   = std::move(root);
                     }
                 }
                 break;
-            case NOT:
-                a = operate.top();
-                operate.pop();
-                operate.push(!a);
+            case NOT: {
+                std::unique_ptr<Node> root = std::make_unique<Node>(*it);
+                if (tree_root == nullptr) {
+                    a = operate.top();
+                    operate.pop();
+                    root->right = std::make_unique<Node>(a);
+                    tree_root  = std::move(root);
+                } else {
+                    root->right = std::move(tree_root);
+                    tree_root  = std::move(root);
+                }
                 break;
+            }
             case '1':
                 operate.push('1'); 
                 break;
