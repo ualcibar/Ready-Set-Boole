@@ -106,7 +106,7 @@ void print_AST(const Node *root) {
         if (current->right != nullptr) {
             if (isOperator(current->right->value))
                 std::cout << " ";
-            std::cout << "   " << current->right->value;
+            std::cout << "  " << current->right->value;
         }
         std::cout << "\n";
         current = current->right.get();
@@ -115,21 +115,36 @@ void print_AST(const Node *root) {
     return;
 }
 
+bool eval_AST(const Node* node) {
+    if (node->left == nullptr && node->right == nullptr) {
+        if (node->value == '1')
+            return true;
+        return false;
+    }
+
+    if (node->value == NOT) {
+        if (node->right->value == '1')
+            return false;
+        return true;
+    }
+
+    bool left_val  = eval_AST(node->left.get());
+    bool right_val = eval_AST(node->right.get());
+    return exec_operation(left_val, right_val, node->value);
+}
+
 bool AST(std::string stack) {
     std::stack<char> operate;
     std::unique_ptr<Node> tree_root = nullptr;
-
+    
     char a;
     char b;
-    int i = 0;
     for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
         if(!(isOperator(*it) || isBit(*it))/* || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))*/) {
             
             std::cout << "Invalid formula\n";
             return 0;
         }
-        std::cout << i << "\n";
-        i++;
         switch(*it) {
             case AND: 
             case XOR:
@@ -184,8 +199,5 @@ bool AST(std::string stack) {
                 break;
         }
     }
-
-    print_AST(tree_root.get());
-    //return operate.top();
-    return 1;
+    return eval_AST(tree_root.get());
 }
