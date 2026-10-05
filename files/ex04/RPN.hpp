@@ -7,9 +7,10 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <algorithm>
 
-#include "AST.hpp"
 #include "adder.hpp"
+#include <memory>
 
 enum Opertors {
     AND = '&', 
@@ -25,5 +26,6 @@ bool isOperator(char operator_simbol);
 bool extract_bit(std::stack <bool> &operate);
 bool exec_operation(bool bit_a, bool bit_b, char operator_simbol);
 bool AST(std::string stack);
+bool truth_table (std::string formula);
 
 #endif

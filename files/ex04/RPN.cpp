@@ -25,7 +25,7 @@ bool isBit(char bit) {
 }
 
 bool isLetterUppercase (char letter) {
-    if (letter >= 65 & letter <= 90)
+    if ((letter >= 65) & (letter <= 90))
         return true;
     return false;
 }
@@ -92,109 +92,6 @@ bool RPN_bool(std::string stack) {
     return operate.top();
 }
 
-void print_AST(const Node *root) {
-    const Node* current = root;
-    int i = 1;
-
-    while (current->right != nullptr) {
-        if ((i == 1)) {
-            for (int f = 0; f < (i - 1) * 2; ++f)
-                std::cout << " ";
-            std::cout << "  " << current->value << "\n";
-        }
-        for (int f = 0; f < (i - 1) * 2; ++f)
-            std::cout << " ";
-        std::cout << " /" << " \\ \n";
-        for (int f = 0; f < (i - 1) * 2; ++f)
-            std::cout << " ";
-        if (current->left != nullptr)
-            std::cout << current->left->value;
-        if (current->right != nullptr) {
-            if (isOperator(current->right->value))
-                std::cout << " ";
-            std::cout << "   " << current->right->value;
-        }
-        std::cout << "\n";
-        current = current->right.get();
-        i++;
-    }
-    return;
-}
-
-bool AST(std::string stack) {
-    std::stack<char> operate;
-    std::unique_ptr<Node> tree_root = nullptr;
-
-    char a;
-    char b;
-    int i = 0;
-    for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if(!(isOperator(*it) || isBit(*it))/* || ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))*/) {
-            
-            std::cout << "Invalid formula\n";
-            return 0;
-        }
-        std::cout << i << "\n";
-        i++;
-        switch(*it) {
-            case AND: 
-            case XOR:
-            case MATERIAL_CONDITION: 
-            case OR: 
-            case LOGICAL_EQUIVALENCE: {
-                    std::unique_ptr<Node> root = std::make_unique<Node>(*it);
-                    
-                    if (tree_root == nullptr) {
-                        b = operate.top();
-                        operate.pop();
-                        a = operate.top();
-                        operate.pop();
-
-                        std::unique_ptr<Node> right_leaf  = std::make_unique<Node>(b);
-                        std::unique_ptr<Node> left_leaf = std::make_unique<Node>(a);
-
-                        root->left  = std::move(left_leaf);
-                        root->right = std::move(right_leaf);
-                        
-                        tree_root = std::move(root);
-                    } else {
-                        a = operate.top();
-                        operate.pop();
-
-                        std::unique_ptr<Node> left_leaf = std::make_unique<Node>(a);
-                        
-                        root->left  = std::move(left_leaf);
-                        root->right = std::move(tree_root);   // <- aquí el cambio
-                        tree_root   = std::move(root);
-                    }
-                }
-                break;
-            case NOT: {
-                std::unique_ptr<Node> root = std::make_unique<Node>(*it);
-                if (tree_root == nullptr) {
-                    a = operate.top();
-                    operate.pop();
-                    root->right = std::make_unique<Node>(a);
-                    tree_root  = std::move(root);
-                } else {
-                    root->right = std::move(tree_root);
-                    tree_root  = std::move(root);
-                }
-                break;
-            }
-            case '1':
-                operate.push('1'); 
-                break;
-            case '0':
-                operate.push('0'); 
-                break;
-        }
-    }
-
-    print_AST(tree_root.get());
-    //return operate.top();
-    return 1;
-}
 bool check_formula (char formula) {
     if (isBit (formula) | isLetterUppercase(formula) | isOperator(formula))
         return true;
@@ -202,14 +99,17 @@ bool check_formula (char formula) {
 }
 
 bool truth_table (std::string formula) {
+
     std::set<char> letters;
-    std::vector<std::map<char, int>> truth_table;
+    std::vector<std::map<char, int>> truth_table_line;
+    std::vector<std::vector<std::map<char, int>>> truth_table;
     std::vector<int> result;
     
     int max_number = 0;
     int letter_cont = 0;
-    u_int32_t i = 0;
+    int i = 0;
     
+    std::cout << formula << "\n";
     for (std::string::iterator it = formula.begin(); it != formula.end(); ++it) {
         if (!check_formula(*it))
         return false;
@@ -218,22 +118,60 @@ bool truth_table (std::string formula) {
         }
     }
     
+    
     letter_cont = letters.size();
     max_number = (1 << letter_cont) - 1;
-    if (i <= max_number) {
+    std::string vars(letters.begin(), letters.end());
+    std::cout << "Letters: " << vars << "\n";
+    std::cout << "Max number: " << max_number << "\n";
+    std::cout << "letter_cont: " << letter_cont << "\n";
+
+    while (i <= max_number) {
         int t = 0;
-        
+        std::vector<std::map<char, int>> truth_table_line;
+        std::map<char, int> result;
         int complete_bit = i;
-        while (t <= letter_cont)
+
+        while (t < letter_cont)
         {
-            int bit = extract_first_bit(complete_bit);
-            
-            std::map<char, int> value[letters[t]] = 0;
-            complete_bit = complete_bit << 1;
+            int bit = !extract_first_bit(complete_bit);
+            std::map<char, int> value;
+            value[vars[t]] = bit;
+            complete_bit = complete_bit >> 1;
+            //std::cout << "complete_bit: " << complete_bit << ' ';
+            truth_table_line.push_back(value);
+            //std::cout << vars[t] << '=' << bit << ' ';
             t++;
         }
+        std::string replaced = formula;
+
+        for (const std::map<char, int>& value : truth_table_line) { 
+            char letra = value.begin()->first;
+            int  bit   = value.begin()->second;
+            if (bit)
+                std::replace(replaced.begin(), replaced.end(), letra, '1');
+            else 
+                std::replace(replaced.begin(), replaced.end(), letra, '0');
+        }
+        result['='] = RPN_bool(replaced);
+        truth_table_line.push_back(result);
+        truth_table.push_back(truth_table_line);
         i++;
     }
 
+    // cabecera
+for (size_t t = 0; t < vars.size(); t++)
+    std::cout << "| " << vars[t] << ' ';
+std::cout << "| " << '=' << ' ';
+std::cout << "|\n";
 
+// filas
+for (const auto& line : truth_table) {           // cada fila
+    for (const auto& value : line)               // cada map (una letra)
+        for (const auto& p : value)              // su único par letra/bit
+            std::cout << "| " << p.second << ' ';
+    std::cout << "|\n";
+}
+
+return 1;
 }
