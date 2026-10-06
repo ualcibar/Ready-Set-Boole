@@ -13,4 +13,6 @@ struct Node
     Node(char v) : value(v), left(nullptr), right(nullptr) {}
 };
 
+void print_AST(const Node *root);
+
 #endif

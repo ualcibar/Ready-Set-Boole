@@ -23,14 +23,14 @@ int main()
 {
     TestCase tests[] = {
         // Conjuncion / disyuncion / XOR
-        /*{"10&", false, ""},
+        {"10&", false, ""},
         {"11&", true,  ""},
         {"10|", true,  ""},
         {"00|", false, ""},
         {"10^", true,  ""},
-        {"11^", false, ""},*/
-        {"10!&",   true,  "(1|0)&10|"},
-/*
+        {"11^", false, ""},
+        {"10&!1&0&",   false,  "(1|0)&10|"},
+
 // Material condition (>)
 {"00>", true,  ""},
 {"01>", true,  ""},
@@ -53,7 +53,7 @@ int main()
         {"10&!",    true,  "!(1&0)"},
         {"11>0=",   false, "(1>1)=0"},
         {"1011||=", true,  "ejemplo del subject"},
-        */
+        
     };
 
     const std::string RED   = "\033[31m";
