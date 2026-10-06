@@ -58,7 +58,7 @@ bool RPN_bool(std::string stack) {
     bool b;
 
     for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if(!(isOperator(*it) || isBit(*it)) /*|| ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))*/) {
+        if(!(isOperator(*it) || isBit(*it))) {
             
             std::cout << "Invalid formula\n";
             return 0;
@@ -99,7 +99,6 @@ bool check_formula (char formula) {
 }
 
 bool truth_table (std::string formula) {
-
     std::set<char> letters;
     std::vector<std::map<char, int>> truth_table_line;
     std::vector<std::vector<std::map<char, int>>> truth_table;
@@ -108,8 +107,7 @@ bool truth_table (std::string formula) {
     int max_number = 0;
     int letter_cont = 0;
     int i = 0;
-    
-    std::cout << formula << "\n";
+
     for (std::string::iterator it = formula.begin(); it != formula.end(); ++it) {
         if (!check_formula(*it))
         return false;
@@ -117,15 +115,9 @@ bool truth_table (std::string formula) {
             letters.insert(*it); 
         }
     }
-    
-    
     letter_cont = letters.size();
     max_number = (1 << letter_cont) - 1;
     std::string vars(letters.begin(), letters.end());
-    std::cout << "Letters: " << vars << "\n";
-    std::cout << "Max number: " << max_number << "\n";
-    std::cout << "letter_cont: " << letter_cont << "\n";
-
     while (i <= max_number) {
         int t = 0;
         std::vector<std::map<char, int>> truth_table_line;
@@ -138,9 +130,7 @@ bool truth_table (std::string formula) {
             std::map<char, int> value;
             value[vars[t]] = bit;
             complete_bit = complete_bit >> 1;
-            //std::cout << "complete_bit: " << complete_bit << ' ';
             truth_table_line.push_back(value);
-            //std::cout << vars[t] << '=' << bit << ' ';
             t++;
         }
         std::string replaced = formula;
@@ -159,16 +149,14 @@ bool truth_table (std::string formula) {
         i++;
     }
 
-    // cabecera
 for (size_t t = 0; t < vars.size(); t++)
     std::cout << "| " << vars[t] << ' ';
 std::cout << "| " << '=' << ' ';
 std::cout << "|\n";
 
-// filas
-for (const auto& line : truth_table) {           // cada fila
-    for (const auto& value : line)               // cada map (una letra)
-        for (const auto& p : value)              // su único par letra/bit
+for (const auto& line : truth_table) {   
+    for (const auto& value : line)             
+        for (const auto& p : value)              
             std::cout << "| " << p.second << ' ';
     std::cout << "|\n";
 }

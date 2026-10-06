@@ -1,4 +1,3 @@
-#include "adder.hpp"
 #include "multiplier.hpp"
 
 int main()

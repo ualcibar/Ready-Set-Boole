@@ -1,17 +1,7 @@
-
-/*#include "RPN.hpp"
-
-
-int main()
-{
-    std::cout << RPN_bool("00=") << "\n";
-    return 1;
-}
-*/
-
 #include <iostream>
 #include <string>
 #include "RPN.hpp"
+#include "AST.hpp"
 
 struct TestCase {
     std::string formula;
@@ -31,17 +21,17 @@ int main()
         {"11^", false, ""},
         {"10&!1&0&",   false,  "(1|0)&10|"},
 
-// Material condition (>)
-{"00>", true,  ""},
-{"01>", true,  ""},
-{"10>", false, "unico caso falso de A > B"},
-{"11>", true,  ""},
+        // Material condition (>)
+        {"00>", true,  ""},
+        {"01>", true,  ""},
+        {"10>", false, "unico caso falso de A > B"},
+        {"11>", true,  ""},
 
-// Logical equivalence (=)
-{"00=", true,  ""},
-{"01=", false, ""},
-{"10=", false, ""},
-{"11=", true,  ""},
+        // Logical equivalence (=)
+        {"00=", true,  ""},
+        {"01=", false, ""},
+        {"10=", false, ""},
+        {"11=", true,  ""},
 
         // Negacion (unario)
         {"1!", false, ""},
