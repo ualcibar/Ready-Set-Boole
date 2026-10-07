@@ -1,6 +1,6 @@
 #include "RPN.hpp"
 
-bool isOperator(char operator_simbol) {
+bool is_operator(char operator_simbol) {
     switch (operator_simbol) {
         case AND:
         case NOT:
@@ -14,7 +14,7 @@ bool isOperator(char operator_simbol) {
     }
 }
 
-bool isBit(char bit) {
+bool is_bit(char bit) {
     switch (bit) {
         case '1':
         case '0':
@@ -22,12 +22,6 @@ bool isBit(char bit) {
         default:
             return false;
     }
-}
-
-bool isLetterUppercase (char letter) {
-    if ((letter >= 65) & (letter <= 90))
-        return true;
-    return false;
 }
 
 bool extract_bit(std::stack <bool> &operate) {
@@ -52,13 +46,13 @@ bool exec_operation(bool bit_a, bool bit_b, char operator_simbol) {
     return 0;
 }
 
-bool RPN_bool(std::string stack) {
+bool eval_formula(std::string formula) {
     std::stack<bool> operate;
     bool a;
     bool b;
 
-    for (std::string::iterator it = stack.begin(); it != stack.end(); ++it) {
-        if(!(isOperator(*it) || isBit(*it))) {
+    for (std::string::iterator it = formula.begin(); it != formula.end(); ++it) {
+        if(!(is_operator(*it) || is_bit(*it)) /*|| ((isOperator(*it) && operate.size() < 2) && (*it != NOT && operate.size() > 0))*/) {
             
             std::cout << "Invalid formula\n";
             return 0;
@@ -90,76 +84,4 @@ bool RPN_bool(std::string stack) {
         }
     }
     return operate.top();
-}
-
-bool check_formula (char formula) {
-    if (isBit (formula) | isLetterUppercase(formula) | isOperator(formula))
-        return true;
-    return false;
-}
-
-bool truth_table (std::string formula) {
-    std::set<char> letters;
-    std::vector<std::map<char, int>> truth_table_line;
-    std::vector<std::vector<std::map<char, int>>> truth_table;
-    std::vector<int> result;
-    
-    int max_number = 0;
-    int letter_cont = 0;
-    int i = 0;
-
-    for (std::string::iterator it = formula.begin(); it != formula.end(); ++it) {
-        if (!check_formula(*it))
-        return false;
-        if (isLetterUppercase(*it)) {
-            letters.insert(*it); 
-        }
-    }
-    letter_cont = letters.size();
-    max_number = (1 << letter_cont) - 1;
-    std::string vars(letters.begin(), letters.end());
-    while (i <= max_number) {
-        int t = 0;
-        std::vector<std::map<char, int>> truth_table_line;
-        std::map<char, int> result;
-        int complete_bit = i;
-
-        while (t < letter_cont)
-        {
-            int bit = !extract_first_bit(complete_bit);
-            std::map<char, int> value;
-            value[vars[t]] = bit;
-            complete_bit = complete_bit >> 1;
-            truth_table_line.push_back(value);
-            t++;
-        }
-        std::string replaced = formula;
-
-        for (const std::map<char, int>& value : truth_table_line) { 
-            char letra = value.begin()->first;
-            int  bit   = value.begin()->second;
-            if (bit)
-                std::replace(replaced.begin(), replaced.end(), letra, '1');
-            else 
-                std::replace(replaced.begin(), replaced.end(), letra, '0');
-        }
-        result['='] = RPN_bool(replaced);
-        truth_table_line.push_back(result);
-        truth_table.push_back(truth_table_line);
-        i++;
-    }
-
-for (size_t t = 0; t < vars.size(); t++)
-    std::cout << "| " << vars[t] << ' ';
-std::cout << "| " << '=' << ' ';
-std::cout << "|\n";
-
-for (const auto& line : truth_table) {   
-    for (const auto& value : line)             
-        for (const auto& p : value)              
-            std::cout << "| " << p.second << ' ';
-    std::cout << "|\n";
-}
-
-return 1;
 }

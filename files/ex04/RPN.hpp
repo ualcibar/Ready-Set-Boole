@@ -4,13 +4,6 @@
 #include <iostream>
 #include <string>
 #include <stack>
-#include <vector>
-#include <set>
-#include <map>
-#include <algorithm>
-
-#include "adder.hpp"
-#include <memory>
 
 enum Opertors {
     AND = '&', 
@@ -21,11 +14,11 @@ enum Opertors {
     LOGICAL_EQUIVALENCE = '='
 };
 
-bool RPN_bool (std::string stack);
-bool isOperator(char operator_simbol);
-bool extract_bit(std::stack <bool> &operate);
-bool exec_operation(bool bit_a, bool bit_b, char operator_simbol);
-bool AST(std::string stack);
-bool truth_table (std::string formula);
+bool eval_formula (std::string formula);
+bool is_operator (char operator_simbol);
+bool is_bit(char bit);
+bool is_operator(char operator_simbol);
+bool extract_bit (std::stack <bool> &operate);
+bool exec_operation (bool bit_a, bool bit_b, char operator_simbol);
 
 #endif

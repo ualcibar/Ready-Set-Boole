@@ -13,11 +13,11 @@ bool check_formula(char formula) {
 }
 
 std::vector<std::vector<std::map<char, int>>> truth_table(std::string formula) {
+    std::string replaced;
     std::set<char> letters;
+    std::vector<int> result;
     std::vector<std::map<char, int>> truth_table_line;
     std::vector<std::vector<std::map<char, int>>> truth_table;
-    std::vector<int> result;
-    std::string replaced;
 
     int max_number = 0;
     int letter_cont = 0;
@@ -63,9 +63,7 @@ std::vector<std::vector<std::map<char, int>>> truth_table(std::string formula) {
         truth_table.push_back(truth_table_line);
         i++;
     }
-
-
-return truth_table;
+    return truth_table;
 }
 
 void print_truth_table (std::vector<std::vector<std::map<char, int>>> truth_table) {

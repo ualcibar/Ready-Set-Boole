@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include "RPN.hpp"
+#include "truth_table.hpp"
 
 int main()
 {
-    truth_table("AB|C&");
+    print_truth_table(truth_table("AB|C&"));
 }
