@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include "truth_table.hpp"
+#include "AST.hpp"
 
 int main()
 {
-    print_truth_table(truth_table("AB|C&"));
+    //std::cout << AST("10|") << "\n";
 }
