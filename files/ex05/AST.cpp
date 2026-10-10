@@ -164,27 +164,41 @@ std::unique_ptr<Node> to_nnf(const Node* node) {
     
     if (node->value == XOR) {
         nuevo = std::make_unique<Node>(OR);
+        
         tmp_left = std::make_unique<Node>(AND);
-        tmp_left->right = std::make_unique<Node>(NOT);
-        tmp_right = std::make_unique<Node>(AND);
-        tmp_right->left = std::make_unique<Node>(NOT);
-
         tmp_left->left = clone(node->left.get());
-        tmp_left->right->left = clone(node->right.get());
-
-        tmp_right->left->left = clone(node->left.get());
+        tmp_left->right = std::make_unique<Node>(NOT);
+        tmp_left->right->right = clone(node->right.get());
+        
+        tmp_right = std::make_unique<Node>(AND);
         tmp_right->right = clone(node->right.get());
+        tmp_right->left = std::make_unique<Node>(NOT);
+        tmp_right->left->right = clone(node->left.get());
 
     } else if (node->value == LOGICAL_EQUIVALENCE) {
-        //Construimos final tree
+        nuevo = std::make_unique<Node>(AND);
 
-        std::cout << "eval =\n";
+        tmp_left = std::make_unique<Node>(OR);
+        tmp_left->left = clone(node->left.get());
+        tmp_left->right = std::make_unique<Node>(NOT);
+        tmp_left->right->right = clone(node->right.get());
+
+        tmp_right = std::make_unique<Node>(OR);
+        tmp_right->left = clone(node->right.get());
+        tmp_right->left = std::make_unique<Node>(NOT);
+        tmp_right->left->right = clone(node->left.get());
+
     } else if (node->value == MATERIAL_CONDITION) {
-        //Construimos final tree
+        nuevo = std::make_unique<Node>(OR);
+        
+        tmp_left = std::make_unique<Node>(NOT);
+        tmp_left->right = clone(node->left.get());
+        tmp_right = clone(node->right.get());
 
-        std::cout << "eval <\n";
-    } else if (node->value == NOT) {
-        //Construimos final tree
+    } else if (node->value == NOT & (node->left != nullptr | node->right != nullptr)) {
+        if (node->left->value == NOT) {
+            if (node->left->left != nullptr)
+        }
 
         std::cout << "eval !\n";
     }
