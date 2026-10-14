@@ -14,6 +14,7 @@ enum Opertors {
     LOGICAL_EQUIVALENCE = '='
 };
 
+bool is_operator_NNF_valid(char operator_simbol);
 bool eval_formula (std::string formula);
 bool is_operator (char operator_simbol);
 bool is_bit(char bit);

@@ -14,6 +14,17 @@ bool is_operator(char operator_simbol) {
     }
 }
 
+bool is_operator_NNF_valid(char operator_simbol) {
+    switch (operator_simbol) {
+        case AND:
+        case OR:
+            return true;
+        default:
+            return false;
+    }
+}
+
+
 bool is_bit(char bit) {
     switch (bit) {
         case '1':

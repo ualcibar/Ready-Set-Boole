@@ -28,6 +28,12 @@ void print_AST(const Node *tree_root) {
     }
 }
 
+std::string AST_to_RPN(const Node *node) {
+    if (node == nullptr)
+        return "";
+    return AST_to_RPN(node->left.get()) + AST_to_RPN(node->right.get()) + node->value;
+}
+
 bool eval_AST(const Node *tree_root) {
     if (tree_root->value == '1')
         return true;
@@ -99,7 +105,7 @@ std::unique_ptr<Node> create_AST(std::string formula) {
                     std::cout << "invalid formula\n";
                     return nullptr;
                 }
-std::unique_ptr<Node> node = std::make_unique<Node>(*it);                
+                std::unique_ptr<Node> node = std::make_unique<Node>(*it);                
                 node->right = std::move(operate.top());
                 operate.pop();
                 node->left = std::move(operate.top()); 
@@ -128,93 +134,179 @@ std::unique_ptr<Node> node = std::make_unique<Node>(*it);
     }
     return std::move(operate.top());
 }
-/*
-std::unique_ptr<Node> eval_AST_NNF(Node *tree_root) {
-    std::unique_ptr<Node> NNF_tree = nullptr; 
-    if (tree_root->value == XOR) {
 
-        NNF_tree = std::move(std::make_unique<Node>(OR));
-        NNF_tree->left = std::make_unique<Node>(AND);
-        NNF_tree->right = std::make_unique<Node>(AND);
-        NNF_tree->left->left = std::move(eval_AST_NNF(tree_root->left.get()));
-        NNF_tree->left->right = std::make_unique<Node>(NOT);
-        NNF_tree->left->right->left = std::move(eval_AST_NNF(tree_root->left.get()));
-
-    } else if (tree_root->value == LOGICAL_EQUIVALENCE) {
-
-        NNF_tree = std::move(std::make_unique<Node>(NOT));
-        NNF_tree->left = std::move(std::make_unique<Node>(XOR));
-        NNF_tree->left->left = std::move(tree_root->left);
-        NNF_tree->left->right = std::move(tree_root->right);
-        NNF_tree= std::move(eval_AST_NNF(NNF_tree.get())); 
-
-    } else if (tree_root->value == MATERIAL_CONDITION) {
-        NNF_tree = std::move(std::make_unique<Node>(NOT));
-
-    }
-
-    //return eval_AST_NNF(or_node.get());
-    return NNF_tree;
-}
-*/
-std::unique_ptr<Node> to_nnf(const Node* node) {
-    std::unique_ptr<Node> nuevo;
-    std::unique_ptr<Node> tmp_left;
-    std::unique_ptr<Node> tmp_right;
+std::unique_ptr<Node> double_negation(const Node* node) {
+    std::unique_ptr<Node> new_node;
     
-    if (node->value == XOR) {
-        nuevo = std::make_unique<Node>(OR);
-        
-        tmp_left = std::make_unique<Node>(AND);
-        tmp_left->left = clone(node->left.get());
-        tmp_left->right = std::make_unique<Node>(NOT);
-        tmp_left->right->right = clone(node->right.get());
-        
-        tmp_right = std::make_unique<Node>(AND);
-        tmp_right->right = clone(node->right.get());
-        tmp_right->left = std::make_unique<Node>(NOT);
-        tmp_right->left->right = clone(node->left.get());
-
-    } else if (node->value == LOGICAL_EQUIVALENCE) {
-        nuevo = std::make_unique<Node>(AND);
-
-        tmp_left = std::make_unique<Node>(OR);
-        tmp_left->left = clone(node->left.get());
-        tmp_left->right = std::make_unique<Node>(NOT);
-        tmp_left->right->right = clone(node->right.get());
-
-        tmp_right = std::make_unique<Node>(OR);
-        tmp_right->left = clone(node->right.get());
-        tmp_right->left = std::make_unique<Node>(NOT);
-        tmp_right->left->right = clone(node->left.get());
-
-    } else if (node->value == MATERIAL_CONDITION) {
-        nuevo = std::make_unique<Node>(OR);
-        
-        tmp_left = std::make_unique<Node>(NOT);
-        tmp_left->right = clone(node->left.get());
-        tmp_right = clone(node->right.get());
-
-    } else if (node->value == NOT & (node->left != nullptr | node->right != nullptr)) {
+    if (node->left != nullptr) {
         if (node->left->value == NOT) {
             if (node->left->left != nullptr)
+            new_node = clone (node->left->left.get());
+            else if (node->left->right != nullptr)
+            new_node = clone (node->left->right.get());
         }
-
-        std::cout << "eval !\n";
+    } else if (node->right != nullptr) {
+        if (node->right->value == NOT) {
+            if (node->right->left != nullptr)
+            new_node = clone (node->right->left.get());
+            else if (node->right->right != nullptr)
+            new_node = clone (node->right->right.get());
+        }
     }
-    if (tmp_left != nullptr)
-        nuevo->left = to_nnf(tmp_left.get());
-    if (tmp_right != nullptr)
-        nuevo->right = to_nnf(tmp_right.get());
+    
+    return new_node;
+}
+
+std::unique_ptr<Node> material_condition(const Node* node) {
+    std::unique_ptr<Node> new_node;
+    
+    new_node = std::make_unique<Node>(OR);
+    
+    new_node->left = std::make_unique<Node>(NOT);
+    new_node->left->right = clone(node->left.get());
+    new_node->right = clone(node->right.get());
+    
+    return new_node;
+}
+
+std::unique_ptr<Node> equivalence(const Node* node) {
+    std::unique_ptr<Node> new_node;
+    
+    new_node = std::make_unique<Node>(AND);
+    
+    new_node->left = std::make_unique<Node>(MATERIAL_CONDITION);
+    new_node->left->left = clone (node->left.get());
+    new_node->left->right = clone (node->right.get());
+    new_node->left = clone(material_condition(new_node->left.get()).get());
+    
+    new_node->right = std::make_unique<Node>(MATERIAL_CONDITION);
+    new_node->right->left = clone (node->right.get());
+    new_node->right->right = clone (node->left.get());
+    new_node->right = clone(material_condition(new_node->right.get()).get());
+    
+    return new_node;
+}
+
+std::unique_ptr<Node> xor_to_nff(const Node* node) {
+    std::unique_ptr<Node> new_node;
+    
+            new_node = std::make_unique<Node>(OR);
+            
+            new_node->left = std::make_unique<Node>(AND);
+            new_node->left->left = clone(node->left.get());
+            new_node->left->right = std::make_unique<Node>(NOT);
+            new_node->left->right->right = clone(node->right.get());
+            
+            new_node->right = std::make_unique<Node>(AND);
+            new_node->right->right = clone(node->right.get());
+            new_node->right->left = std::make_unique<Node>(NOT);
+            new_node->right->left->right = clone(node->left.get());
+    return new_node;
+}
+
+std::unique_ptr<Node> morgan_law(const Node* node) {
+    std::unique_ptr<Node> new_node;
+    
+        if (node->left != nullptr) {
+
+            switch (node->left->value) {
+                case AND:
+                new_node = std::make_unique<Node>(OR);
+                new_node->left = std::make_unique<Node>(NOT);
+                new_node->right = std::make_unique<Node>(NOT);
+                new_node->left->left = clone(node->left->left.get());
+                new_node->right->left = clone(node->left->right.get());
+                break;
+                
+                case OR:
+                new_node = std::make_unique<Node>(AND);
+                new_node->left = std::make_unique<Node>(NOT);
+                new_node->right = std::make_unique<Node>(NOT);
+                new_node->left->left = clone(node->left->left.get());
+                new_node->right->left = clone(node->left->right.get());
+                break;
+            }
+        }else if (node->right != nullptr) {
+
+            switch (node->right->value) {
+                case AND:
+                new_node = std::make_unique<Node>(OR);
+                new_node->left = std::make_unique<Node>(NOT);
+                new_node->right = std::make_unique<Node>(NOT);
+                new_node->left->left = clone(node->right->left.get());
+                new_node->right->left = clone(node->right->right.get());
+                break;
+                
+                case OR:
+                new_node = std::make_unique<Node>(AND);
+                new_node->left = std::make_unique<Node>(NOT);
+                new_node->right = std::make_unique<Node>(NOT);
+                new_node->left->left = clone(node->right->left.get());
+                new_node->right->left = clone(node->right->right.get());
+                break;
+            }
+        }
+        return new_node;
+}
+
+std::unique_ptr<Node> to_nnf(const Node* node) {
+    std::unique_ptr<Node> nuevo;
+
+    if (node != nullptr) {
+        if (node->value == XOR) {
+            nuevo = xor_to_nff(node);
+            
+        } else if (node->value == LOGICAL_EQUIVALENCE) {
+            nuevo = equivalence(node);
+            
+        } else if (node->value == MATERIAL_CONDITION) {
+            nuevo = material_condition(node);
+            
+        } else if (node->value == NOT) {
+            if (node->left != nullptr) {
+                if (node->left->value == NOT) {
+                    nuevo = std::move(double_negation(node));
+                } else if (is_operator_NNF_valid(node->left->value)) {
+                    nuevo = std::move(morgan_law(node));
+                } else if (node->left->value == MATERIAL_CONDITION) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(material_condition(node->left.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                } else if (node->left->value == LOGICAL_EQUIVALENCE) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(equivalence(node->left.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                } else if (node->left->value == XOR) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(xor_to_nff(node->left.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                }
+            } else if (node->right != nullptr) {
+                if (node->right->value == NOT) {
+                    nuevo = double_negation(node);
+                } else if (is_operator_NNF_valid(node->right->value))
+                    nuevo = std::move(morgan_law(node));
+                else if (node->right->value == MATERIAL_CONDITION) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(material_condition(node->right.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                } else if (node->right->value == LOGICAL_EQUIVALENCE) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(equivalence(node->right.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                } else if (node->right->value == XOR) {
+                    std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
+                    tmp_node->right = clone(xor_to_nff(node->left.get()).get());
+                    nuevo = std::move(morgan_law(tmp_node.get()));
+                }
+            }
+        }
+        if (nuevo == nullptr)
+            nuevo = clone (node);
+        if (nuevo->left != nullptr)
+            nuevo->left = to_nnf(nuevo->left.get());
+        if (nuevo->right != nullptr)
+            nuevo->right = to_nnf(nuevo->right.get());
+    } 
     return nuevo;
 }
-
-
-/*
-std::string NNF(std::string formula) {
-    std::unique_ptr<Node> AST;
-    
-    AST = std::move(create_AST(formula));
-    eval_AST_NNF(AST.get());
-}
-*/
