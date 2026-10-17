@@ -233,8 +233,8 @@ std::unique_ptr<Node> morgan_law(const Node* node) {
                 new_node = std::make_unique<Node>(OR);
                 new_node->left = std::make_unique<Node>(NOT);
                 new_node->right = std::make_unique<Node>(NOT);
-                new_node->left->left = clone(node->right->left.get());
-                new_node->right->left = clone(node->right->right.get());
+                new_node->left->right = clone(node->right->left.get());
+                new_node->right->right = clone(node->right->right.get());
                 break;
                 
                 case OR:
@@ -253,6 +253,7 @@ std::unique_ptr<Node> to_nnf(const Node* node) {
     std::unique_ptr<Node> nuevo;
 
     if (node != nullptr) {
+        
         if (node->value == XOR) {
             nuevo = xor_to_nff(node);
             
@@ -266,6 +267,8 @@ std::unique_ptr<Node> to_nnf(const Node* node) {
             if (node->left != nullptr) {
                 if (node->left->value == NOT) {
                     nuevo = std::move(double_negation(node));
+                    if (nuevo->value == NOT)
+                        nuevo = to_nnf(nuevo.get());
                 } else if (is_operator_NNF_valid(node->left->value)) {
                     nuevo = std::move(morgan_law(node));
                 } else if (node->left->value == MATERIAL_CONDITION) {
@@ -284,8 +287,11 @@ std::unique_ptr<Node> to_nnf(const Node* node) {
             } else if (node->right != nullptr) {
                 if (node->right->value == NOT) {
                     nuevo = double_negation(node);
-                } else if (is_operator_NNF_valid(node->right->value))
-                    nuevo = std::move(morgan_law(node));
+                    if ((nuevo->value != 0)| (nuevo->value != 1))
+                        nuevo = to_nnf(nuevo.get());
+                } else if (is_operator_NNF_valid(node->right->value)) {
+                    nuevo = clone(morgan_law(node).get());
+                }
                 else if (node->right->value == MATERIAL_CONDITION) {
                     std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
                     tmp_node->right = clone(material_condition(node->right.get()).get());
@@ -296,13 +302,15 @@ std::unique_ptr<Node> to_nnf(const Node* node) {
                     nuevo = std::move(morgan_law(tmp_node.get()));
                 } else if (node->right->value == XOR) {
                     std::unique_ptr<Node> tmp_node = std::make_unique<Node>(NOT);
-                    tmp_node->right = clone(xor_to_nff(node->left.get()).get());
+                    tmp_node->right = clone(xor_to_nff(node->right.get()).get());
                     nuevo = std::move(morgan_law(tmp_node.get()));
                 }
             }
         }
+        
         if (nuevo == nullptr)
-            nuevo = clone (node);
+        nuevo = clone (node);
+        
         if (nuevo->left != nullptr)
             nuevo->left = to_nnf(nuevo->left.get());
         if (nuevo->right != nullptr)

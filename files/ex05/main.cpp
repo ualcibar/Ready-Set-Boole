@@ -2,19 +2,18 @@
 #include <string>
 #include "AST.hpp"
 
-/*
 int main ()
 {
-    std::cout << AST_to_RPN(to_nnf(create_AST("10^").get()).get()) << "\n";       // 10!&
+    std::cout << AST_to_RPN(to_nnf(create_AST("10>!!").get()).get()) << "\n";  // hoy: 10>;       esperado: 1!0|
 }
-*/
-// NNF en RPN con hojas 0/1: solo 0 1 & | !, y cada '!' justo detrás de una hoja
-static bool is_nnf_rpn(const std::string &s) {
-    if (s.empty())
+    /*
+    // NNF en RPN con hojas 0/1: solo 0 1 & | !, y cada '!' justo detrás de una hoja
+    static bool is_nnf_rpn(const std::string &s) {
+        if (s.empty())
         return false;
-    for (size_t i = 0; i < s.size(); ++i) {
-        char c = s[i];
-        if (c == '0' || c == '1' || c == '&' || c == '|')
+        for (size_t i = 0; i < s.size(); ++i) {
+            char c = s[i];
+            if (c == '0' || c == '1' || c == '&' || c == '|')
             continue;
         if (c == '!' && i > 0 && (s[i - 1] == '0' || s[i - 1] == '1'))
             continue;
@@ -60,3 +59,4 @@ int main() {
     check("10^1^",     "10!&1!0&|1!&10&1!0!&|1&|");
     check("10|!1&0>",  "10|1!|0|");
 }
+*/
