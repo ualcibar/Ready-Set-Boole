@@ -27,7 +27,6 @@ inline std::unique_ptr<Node> clone(const Node* node) {
 void print_AST(const Node *tree_root);
 bool eval_AST(const Node *tree_root);
 std::string AST_to_RPN(const Node *node);
-std::string NNF(std::string formula);
 std::unique_ptr<Node> to_nnf(const Node* node);
 std::unique_ptr<Node> create_AST(std::string formula);
 std::unique_ptr<Node> create_bin_AST(std::string formula);
