@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "AST.hpp"
+#include "NFF.hpp"
 
 /*
 int main ()
