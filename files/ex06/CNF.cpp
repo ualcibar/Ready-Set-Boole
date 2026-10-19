@@ -15,7 +15,7 @@ std::unique_ptr<Node> to_cnf(const Node* node) {
 
                     new_node->right->right = clone (node->right.get());
                     new_node->right->left = clone (node->left->right.get());
-            } else if (node->right->value == AND && is_variable(node->left->value)) {
+            } else if (node->right->value == AND && (is_variable(node->left->value) || node->left->value == NOT)) {
                     new_node = std::make_unique<Node>(AND);
                     new_node->left = std::make_unique<Node>(OR);
                     new_node->right = std::make_unique<Node>(OR);
