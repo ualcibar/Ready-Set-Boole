@@ -15,6 +15,7 @@ std::unique_ptr<Node> xor_equivalent(const Node* node);
 std::unique_ptr<Node> morgan_law(const Node* node);
 std::unique_ptr<Node> not_to_nff(const Node* node);
 std::unique_ptr<Node> to_nnf(const Node* node);
+std::string negation_normal_form(std::string formula);
 
 
 #endif

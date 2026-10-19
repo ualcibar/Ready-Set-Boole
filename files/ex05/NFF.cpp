@@ -22,6 +22,13 @@ std::unique_ptr<Node> double_negation(const Node* node) {
     return new_node;
 }
 
+std::string negation_normal_form(std::string formula) {
+    std::unique_ptr<Node> tree = create_AST(formula);
+    if (tree == nullptr)
+        return "";   // fórmula inválida: create_AST ya imprimió el error
+    return AST_to_RPN(to_nnf(tree.get()).get());
+}
+
 std::unique_ptr<Node> material_condition_equivalent(const Node* node) {
     std::unique_ptr<Node> new_node;
     
