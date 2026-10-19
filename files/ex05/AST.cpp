@@ -124,13 +124,20 @@ std::unique_ptr<Node> create_AST(std::string formula) {
                 operate.push(std::move(neg));
                 break;
             }
-            case '1': 
-            case '0': {
+            default: {
+                if (!is_bit(*it) && !is_variable(*it)) {
+                    std::cout << "invalid formula\n";
+                    return nullptr;
+                }
                 std::unique_ptr<Node> node = std::make_unique<Node>(*it);
                 operate.push(std::move(node));
                 break;
             }
         }
+    }
+    if (operate.size() != 1) {
+        std::cout << "invalid formula\n";
+        return nullptr;
     }
     return std::move(operate.top());
 }
