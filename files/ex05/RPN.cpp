@@ -57,6 +57,10 @@ bool exec_operation(bool bit_a, bool bit_b, char operator_simbol) {
     return 0;
 }
 
+bool is_variable(char c) {
+    return c >= 'A' && c <= 'Z';
+}
+
 bool eval_formula(std::string formula) {
     std::stack<bool> operate;
     bool a;
