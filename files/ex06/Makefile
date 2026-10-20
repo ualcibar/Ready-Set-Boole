@@ -1,6 +1,6 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
-NAME = ex05
+NAME = ex06
 
 SRCS = main.cpp multiplier.cpp adder.cpp RPN.cpp AST.cpp truth_table.cpp NNF.cpp CNF.cpp
 OBJS = $(SRCS:.cpp=.o)
