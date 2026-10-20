@@ -6,7 +6,7 @@ std::vector<std::vector<int>> powerset (std::vector<int> set) {
     int i = 0;
     std::vector<std::vector<int>> powerset;
 
-    size_set = set.size() - 1;
+    size_set = set.size();
     max_number = (1 << size_set) - 1;
 
     while (i <= max_number) {
@@ -17,7 +17,6 @@ std::vector<std::vector<int>> powerset (std::vector<int> set) {
         while (t < size_set)
         {
             int bit;
-            std::vector<int> tmp_set;
 
             bit = !extract_first_bit(complete_bit);
             if (bit == 1) {
