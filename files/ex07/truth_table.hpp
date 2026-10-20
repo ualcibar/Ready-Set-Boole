@@ -14,5 +14,7 @@
 
 std::vector<std::vector<std::map<char, int>>> truth_table(std::string formula);
 void print_truth_table (std::vector<std::vector<std::map<char, int>>> truth_table);
+bool is_letter_uppercase(char letter);
+bool check_formula(char formula);
 
 #endif
