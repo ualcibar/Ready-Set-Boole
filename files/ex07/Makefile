@@ -2,7 +2,7 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17
 NAME = ex07
 
-SRCS = main.cpp multiplier.cpp adder.cpp RPN.cpp AST.cpp truth_table.cpp NNF.cpp CNF.cpp
+SRCS = main.cpp multiplier.cpp adder.cpp RPN.cpp AST.cpp truth_table.cpp NNF.cpp CNF.cpp sat.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
