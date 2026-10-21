@@ -46,18 +46,21 @@ std::vector<int> eval_set(std::string formula, std::vector<std::vector<int>> set
     
     std::map<char, std::vector<int>> set_map;
     std::vector<int> global_set;
+    std::vector<char> letter_set;
     std::stack <std::vector<int>> operate;
     std::vector<int> set_a;
     std::vector<int> set_b;
     int i = 0;
 
     for (char c : formula) {
-        if (c >= 'A' && c <= 'Z' && set_map.find(c) == set_map.end()) {
-            if (i >= static_cast<int>(sets.size()))
-                throw std::invalid_argument("Faltan conjuntos");
-            set_map.emplace(c, sets[i]);
-            i++;
+        if (c >= 'A' && c <= 'Z' && std::find(letter_set.begin(), letter_set.end(), c) == set_a.end()) {
+            letter_set.push_back(c);
         }
+    }
+    std::sort(letter_set.begin(), letter_set.end());
+    for (char c : letter_set) {
+        set_map.emplace(c, sets[i]);
+        i++;
     }
 
     for (auto set : sets) {
