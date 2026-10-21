@@ -81,7 +81,7 @@ std::vector<int> eval_set(std::string formula, std::vector<std::vector<int>> set
                     operate.pop();
                     set_a = operate.top();
                     operate.pop();
-                    operate.push(exec_set_operation(set_b, set_b, global_set, c));
+                    operate.push(exec_set_operation(set_a, set_b, global_set, c));
                     break;
                 default:
                     throw std::invalid_argument("caracter de Formula invalido");
