@@ -14,14 +14,14 @@ std::vector<int> exec_set_operation(std::vector<int> set_a, std::vector<int> set
     switch (operator_simbol) {
         case AND:
             for (int x : set_b) {
-                if (std::find(set_a.begin(), set_a.end(), x) == set_a.end())
-                    set_a.push_back(x);
+                if (std::find(set_a.begin(), set_a.end(), x) != set_a.end())
+                    result.push_back(x);
             }
             return (set_a);
         case OR:
             for (int x : set_a) {
-                if (std::find(set_b.begin(), set_b.end(), x) == set_b.end())
-                    result.push_back(x);
+                if (std::find(set_b.begin(), set_b.end(), x) != set_b.end())
+                    set_a.push_back(x);
             }
             return (result);
         case XOR:
@@ -82,6 +82,11 @@ std::vector<int> eval_set(std::string formula, std::vector<std::vector<int>> set
                     set_a = operate.top();
                     operate.pop();
                     operate.push(exec_set_operation(set_a, set_b, global_set, c));
+                    break;
+                case NOT:
+                    set_a = not_set_operation(operate.top(), global_set);
+                    operate.pop();
+                    operate.push(set_a);
                     break;
                 default:
                     throw std::invalid_argument("caracter de Formula invalido");
