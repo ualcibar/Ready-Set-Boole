@@ -53,7 +53,7 @@ std::vector<int> eval_set(std::string formula, std::vector<std::vector<int>> set
     int i = 0;
 
     for (char c : formula) {
-        if (c >= 'A' && c <= 'Z' && std::find(letter_set.begin(), letter_set.end(), c) == set_a.end()) {
+        if (c >= 'A' && c <= 'Z' && std::find(letter_set.begin(), letter_set.end(), c) == letter_set.end()) {
             letter_set.push_back(c);
         }
     }
