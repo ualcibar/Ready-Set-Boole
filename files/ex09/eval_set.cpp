@@ -20,10 +20,10 @@ std::vector<int> exec_set_operation(std::vector<int> set_a, std::vector<int> set
             return (result);
         case OR:
             for (int x : set_a) {
-                if (std::find(set_b.begin(), set_b.end(), x) != set_b.end())
-                    set_a.push_back(x);
+                if (std::find(set_b.begin(), set_b.end(), x) == set_b.end())
+                    set_b.push_back(x);
             }
-            return (set_a);
+            return (set_b);
         case XOR:
             for (int x : set_a) {
                 if (std::find(set_b.begin(), set_b.end(), x) == set_b.end())
